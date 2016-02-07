@@ -1,1 +1,21 @@
-My Page
+---
+layout: default
+---
+
+<div class="container">
+	name: <span id="name"></span> <br>
+	content: <span id="content"></span>
+</div>
+
+<script>
+	(function () {
+		var req = new XMLHttpRequest();
+		req.open('GET', './example.json');
+		
+		req.response = function (a,b,c,d) {
+			console.log(a,b,c,d);
+		};
+		
+		req.send();
+	})();
+</script>

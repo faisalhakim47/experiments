@@ -1,0 +1,14 @@
+highlighter: rouge
+markdown: kramdown
+url: http://faisalhakim47.github.io/experiments
+title: faisalhakim47 experiments
+email: faisalhakim47@gmail.com
+author: Faisal Hakim
+description: I write what you read.
+paginate: 7
+permalink: /:title
+google_analytics: 
+gems: [jekyll-paginate]
+sass:
+  style: compressed
+  sass_dir: _sass
