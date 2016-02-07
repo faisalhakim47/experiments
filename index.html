@@ -12,8 +12,10 @@ layout: default
 		var req = new XMLHttpRequest();
 		req.open('GET', './example.json');
 		
-		function load(a,b,c,d) {
-			console.log(a,b,c,d);
+		function load(event) {
+			var res = JSON.parse(event.currentTarget.responseText);
+			document.getElementById('name').innerHTML = res.name; 
+			document.getElementById('content').innerHTML = res.content; 
 		}
 		
 		req.addEventListener('load', load);
