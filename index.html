@@ -12,9 +12,11 @@ layout: default
 		var req = new XMLHttpRequest();
 		req.open('GET', './example.json');
 		
-		req.response = function (a,b,c,d) {
+		function load(a,b,c,d) {
 			console.log(a,b,c,d);
-		};
+		}
+		
+		req.addEventListener('load', load);
 		
 		req.send();
 	})();
