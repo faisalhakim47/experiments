@@ -1,0 +1,195 @@
+<html>
+
+<head>
+	<title>Randomize</title>
+
+	<link rel="stylesheet" href="libs/font-awesome/css/font-awesome.min.css">
+	<style>
+		* {
+			box-sizing: border-box;
+			font: inherit;
+		}
+		
+		ol,
+		ul {
+			list-style-position: inside;
+			padding: 5px;
+		}
+		
+		body {
+			margin: 0;
+			font-size: 14px;
+			font-family: Ubuntu;
+			max-height: 100vh;
+		}
+		
+		.container {
+			display: flex;
+			flex-flow: row nowrap;
+			max-height: 100vh;
+		}
+		
+		.container .one {
+			width: 30%;
+			min-width: 320px;
+		}
+		
+		.container .two {
+			width: 70%;
+		}
+		
+		.container .two ol {
+			display: flex;
+			flex-flow: row wrap;
+		}
+		
+		.container .two ol > li {
+			background-color: #CFC;
+			margin: 15px;
+			padding: 15px;
+		}
+		
+		.item input:not(.add) {
+			border-bottom: 1px dotted #FFF;
+		}
+		
+		.item:hover input {
+			border-bottom: 1px dotted #111;
+		}
+		
+		.item .close {
+			cursor: pointer;
+			display: none;
+		}
+		
+		.item:hover .close {
+			display: initial;
+		}
+		
+		.item-input {
+			border: none;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="one">
+			<div class="generate">
+				<input type="text" v-model="groupsLength" @keyup="save();">
+				<button @click="generate()"><span class="fa fa-random"></span> Generate</button>
+			</div>
+			<ul>
+				<li class="item" v-for="item in items">
+					<input class="item-input" v-model="item" @keyup="save()"></input>
+					<span class="close fa fa-times" @click="remove($index)"></span>
+				</li>
+				<li class="item">
+					<input class="item-input add" v-model="input" @keydown.enter="add(input)">
+					<button @click="add(input)"><span class="fa fa-plus"></span> Add</button>
+				</li>
+			</ul>
+		</div>
+		<div class="two">
+			<ol>
+				<li v-for="items in itemGroups">
+					Group
+					<ul>
+						<li v-for="item in items">{{ item }}</li>
+					</ul>
+				</li>
+			</ol>
+		</div>
+	</div>
+
+	<script src="libs/vue/dist/vue.min.js"></script>
+	<script>
+		function uniqueItems(items) {
+			return items.filter((item, i, arr) => arr.lastIndexOf(item) === i )
+		}
+		
+		function getOneRandomly(items) {
+			var index = Math.floor(Math.random() * items.length)
+			return { value: items[index], index }
+		}
+		
+		function randomize(items, result) {
+			if (items.length) {
+				result = result || []
+				result.push(items.splice(getOneRandomly(items).index, 1)[0])
+				return randomize(items, result)
+			} else {
+				return result
+			}
+		}
+		
+		function groupFor(items, length) {
+			if (length > items.length) length = items.length
+			var result = []
+			var quant = Math.floor(items.length / length)
+			while(length--) {
+				var times = quant
+				result.unshift([])
+				while (times--) {
+					result[0].push(items.splice(0, 1))
+				}
+			}
+			items.forEach((item, i) => {
+				result[i].push(item)
+			})
+			return result
+		}
+		
+		function pureJSON(json) {
+			return JSON.parse(JSON.stringify(json))
+		}
+
+		new Vue({
+			el: 'body',
+			data: {
+				items: [],
+				itemGroups: [],
+				input: '',
+				groupsLength: 1
+			},
+			ready() {
+				if (localStorage.data) {
+					var data = JSON.parse(localStorage.data)
+					this.items = data.items
+					this.groupsLength = data.groupsLength
+					console.log(data)
+				} else {
+					this.items = ["Sella","Alvi","Mey","Novi","Desta","Arini","Siti M.","Mut","Rukah","Fitri","Arum","Roi","Ria","Muna","Hariri","Dea","Lutfi","Nida","Faisal A.","Luqman","Nadhir","Yani","Hendi","Soleh","Husein","C. Rizal","Niska","Rizki","Adam","Faisal H.","Ava","Rizal Maulana","Nazil","Okta"]
+					this.groupsLength = 5
+					this.save()
+				}
+			},
+			methods: {
+				add(text) {
+					var items = pureJSON(this.items)
+					items.push(text)
+					this.$set('items', uniqueItems(items))
+					this.clearInput()
+					this.save()
+				},
+				clearInput() {
+					this.input = ''
+				},
+				remove(index) {
+					this.items.splice(index, 1)
+				},
+				save() {
+					localStorage.data = JSON.stringify({
+						items: this.items,
+						groupsLength: parseInt(this.groupsLength, 10)
+					})
+				},
+				generate() {
+					this.itemGroups = groupFor(randomize(pureJSON(this.items)), this.groupsLength)
+				}
+			}
+		})
+	</script>
+</body>
+
+</html>
